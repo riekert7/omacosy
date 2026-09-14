@@ -28,6 +28,13 @@ fi
 mkdir -p "$CURRENT_DIR"
 ln -sfn "$THEMES_DIR/$NAME" "$CURRENT_DIR/theme"
 
+# Ghostty: render the palette into config/ghostty/themes/omacosy. Ghostty
+# neither watches its config nor offers a reload-config CLI action, so open
+# windows repaint on the next Cmd+Shift+, — new ones are already correct.
+if [ -x "$HOME/.local/bin/omacosy-ghostty-theme" ]; then
+  "$HOME/.local/bin/omacosy-ghostty-theme" "$CURRENT_DIR/theme" || true
+fi
+
 # Korren: prefer its hand-tuned built-in theme when one matches; fall
 # back to live-deriving from the omarchy palette. Korren watches its
 # config file, so this repaints immediately.

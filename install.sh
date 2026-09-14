@@ -339,6 +339,7 @@ link "$REPO_DIR/bin/omacosy-update" "$HOME/.local/bin/omacosy-update"
 link "$REPO_DIR/bin/omacosy-spawn" "$HOME/.local/bin/omacosy-spawn"
 link "$REPO_DIR/bin/omacosy-wm-switch" "$HOME/.local/bin/omacosy-wm-switch"
 link "$REPO_DIR/bin/omacosy-karabiner-omniwm" "$HOME/.local/bin/omacosy-karabiner-omniwm"
+link "$REPO_DIR/bin/omacosy-ghostty-theme" "$HOME/.local/bin/omacosy-ghostty-theme"
 link "$REPO_DIR/bin/omacosy-layout" "$HOME/.local/bin/omacosy-layout"
 link "$REPO_DIR/bin/omacosy-float" "$HOME/.local/bin/omacosy-float"
 link "$REPO_DIR/bin/omacosy-cycle" "$HOME/.local/bin/omacosy-cycle"
@@ -363,6 +364,14 @@ if [ ! -e "$HOME/.config/omarchy/current/theme" ]; then
   log "Applying default theme (tokyo-night)"
   "$REPO_DIR/bin/theme-set" tokyo-night
 fi
+
+# The Ghostty theme is generated (gitignored, like aerospace.toml) and lives
+# under config/ghostty/, which link() copies with rm -rf — so it is gone after
+# every update unless it is rewritten here as well as by theme-set.
+if [ -L "$HOME/.config/omarchy/current/theme" ]; then
+  "$REPO_DIR/bin/omacosy-ghostty-theme" || true
+fi
+
 
 # --- 4. Point Korren at the omarchy theme -----------------------------------
 # Korren is the author's terminal and not something this installer can

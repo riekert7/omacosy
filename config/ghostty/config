@@ -7,6 +7,8 @@
 # moving is Super+Shift+arrows, so nothing the bar provided is lost.
 macos-titlebar-style = hidden
 
+theme = omacosy
+
 # Pin the initial size of NEW windows (in cells). Ghostty otherwise
 # inherits the previous window's size, and under a tiling WM that is
 # usually the full screen — so every spawn played its open animation at
