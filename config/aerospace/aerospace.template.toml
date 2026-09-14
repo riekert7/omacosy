@@ -127,13 +127,6 @@ cmd-ctrl-alt-t = 'layout floating tiling'
 # THIS file, so the sheet cannot drift from the keys it documents.
 cmd-ctrl-alt-k = 'exec-and-forget /usr/bin/touch /tmp/omacosy-bar-cheatsheet'
 
-# Scratchpad (omarchy: Super+S toggle, Super+Alt+S send — Super+S is
-# spent on floats here and Super+Alt is not expressible, so both land
-# on omarchy's own alias, Grave). Not a hyprland special workspace:
-# aerospace cannot overlay, so S is summoned to the monitor you are on.
-cmd-ctrl-alt-backtick = 'exec-and-forget $HOME/.local/bin/omacosy-scratchpad toggle'
-cmd-ctrl-alt-shift-backtick = 'exec-and-forget $HOME/.local/bin/omacosy-scratchpad send'
-
 # Floats
 # Surface the next float on this workspace (S for surface). macOS
 # z-orders windows per APP, so a float sinks behind whichever app you
