@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# omacosy-move-swap <left|down|up|right> — Super+Shift+Arrow.
+#
+# omarchy binds this to hyprland's `swapwindow`, which EXCHANGES the
+# focused window with its neighbour and does so across monitors.
+# aerospace has `swap`, but it is workspace-confined (no --boundaries,
+# and its --wrap-around is documented as wrapping "to the opposite side
+# of the workspace") — and since every monitor here shows a DIFFERENT
+# workspace, a cross-monitor swap is really a cross-WORKSPACE swap,
+# which aerospace has no primitive for. Hence this.
+#
+# Three cases, in order:
+#   1. room inside the workspace  -> plain `move` (aerospace's own)
+#   2. at the edge, other monitor has windows -> exchange, omarchy-style
+#   3. at the edge, other monitor is empty    -> push (hyprland no-ops
+#      here; keeping the push is strictly better and costs nothing)
+#
+# Deliberately NOT written against the 1-9/11-19 twin-slot convention:
+# it asks aerospace which workspace is actually focused after the move,
+# so it keeps working if the per-monitor workspace model ever changes.
+set -euo pipefail
+dir="${1:-}"
+case "$dir" in left | down | up | right) ;; *) exit 2 ;; esac
+
+A="$(command -v aerospace || echo /opt/homebrew/bin/aerospace)"
+
+# 1. Inside the workspace, aerospace already does the right thing.
+#    --boundaries-action fail (not the default `stop`) is what turns
+#    "nothing that way" into a non-zero exit we can branch on.
+if "$A" move --boundaries workspace --boundaries-action fail "$dir" 2>/dev/null; then
+  exit 0
+fi
+
+# We are at the workspace edge. Snapshot BEFORE moving: once the focused
+# window lands on the other monitor it becomes indistinguishable from
+# the windows that were already there.
+src_ws="$("$A" list-workspaces --focused)"
+before="$("$A" list-windows --all --format '%{window-id}|%{workspace}')"
+
+# 2/3. Hand the direction to aerospace — it resolves which monitor lies
+#      that way. Non-zero means there is no monitor there: stop, exactly
+#      as the old `--boundaries all-monitors-outer-frame` did.
+"$A" move-node-to-monitor --focus-follows-window "$dir" 2>/dev/null || exit 0
+
+# Focus followed the window, so the focused workspace IS the target.
+dst_ws="$("$A" list-workspaces --focused)"
+[ "$dst_ws" = "$src_ws" ] && exit 0
+
+# The swap partner: a window that was on the target workspace before we
+# arrived. First in aerospace's list = first in its tree order, which is
+# the visually leading tile. With one window a side — the case omarchy
+# users actually hit — this is exactly hyprland's choice; with three or
+# more, hyprland picks the geometrically nearest and we may differ.
+partner="$(printf '%s\n' "$before" | awk -F'|' -v w="$dst_ws" '$2 == w { print $1; exit }')"
+[ -n "$partner" ] || exit 0   # target was empty: case 3, the push stands
+
+"$A" move-node-to-workspace --window-id "$partner" "$src_ws"
+
+# A window moved between two workspaces with nothing on screen to show
+# for it gives the window server no event, so the bar would sit stale.
+: > /tmp/omacosy-bar-moved

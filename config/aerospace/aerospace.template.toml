@@ -111,12 +111,15 @@ cmd-ctrl-alt-up = 'focus --boundaries all-monitors-outer-frame up'
 cmd-ctrl-alt-right = 'focus --boundaries all-monitors-outer-frame right'
 
 # Move windows (omarchy: Super+Shift+Arrows)
-# same boundary rule as focus above, so a window can be pushed onto the
-# other display instead of stopping dead at the screen edge
-cmd-ctrl-alt-shift-left = 'move --boundaries all-monitors-outer-frame left'
-cmd-ctrl-alt-shift-down = 'move --boundaries all-monitors-outer-frame down'
-cmd-ctrl-alt-shift-up = 'move --boundaries all-monitors-outer-frame up'
-cmd-ctrl-alt-shift-right = 'move --boundaries all-monitors-outer-frame right'
+# omarchy's binding is hyprland's `swapwindow`, which EXCHANGES with the
+# neighbour and crosses monitors doing it. aerospace's `swap` cannot
+# leave the workspace, and each monitor here shows a different one, so
+# the exchange lives in a wrapper: move inside the workspace, swap at
+# the monitor edge, plain push when the other side is empty.
+cmd-ctrl-alt-shift-left = 'exec-and-forget $HOME/.local/bin/omacosy-move-swap left'
+cmd-ctrl-alt-shift-down = 'exec-and-forget $HOME/.local/bin/omacosy-move-swap down'
+cmd-ctrl-alt-shift-up = 'exec-and-forget $HOME/.local/bin/omacosy-move-swap up'
+cmd-ctrl-alt-shift-right = 'exec-and-forget $HOME/.local/bin/omacosy-move-swap right'
 
 # Layout (omarchy: Super+T float toggle, Super+J split toggle, Super+F fullscreen)
 cmd-ctrl-alt-t = 'layout floating tiling'
