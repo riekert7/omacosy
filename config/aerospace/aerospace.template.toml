@@ -60,10 +60,14 @@ inner.vertical = 8
 outer.left = 8
 outer.bottom = 8
 outer.right = 8
-# room for the bar: measured from the display top on flat monitors,
-# but from below the notch strip on built-in notched displays (macOS
-# reports usable space starting there), so the laptop needs less
-outer.top = [{ monitor.'built-in' = 10 }, 42]
+# room for the bar: the bar window is 34pt tall and sits at the top of
+# the display's *frame*, + 8 to match the other gaps = 42.
+# NOT less on a notched built-in: macOS does carve the notch strip out
+# of the frame (15" Air: 1440x932 panel -> 1440x900 frame), but the bar
+# is drawn at the top of that 900 — inside the tiling area, not up in
+# the strip — so the laptop needs exactly the same 42 as a flat monitor.
+# A smaller value here puts every tiled window under the bar.
+outer.top = 42
 
 # Fixed-size settings windows fight the tiler (resize -> snap back ->
 # relayout flicker); float them instead.
