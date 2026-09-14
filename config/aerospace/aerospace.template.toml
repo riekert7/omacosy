@@ -101,16 +101,22 @@ cmd-ctrl-alt-space = 'exec-and-forget open -a Raycast'
 cmd-ctrl-alt-w = 'close'
 
 # Focus (omarchy: Super+Arrows)
-cmd-ctrl-alt-left = 'focus left'
-cmd-ctrl-alt-down = 'focus down'
-cmd-ctrl-alt-up = 'focus up'
-cmd-ctrl-alt-right = 'focus right'
+# Hyprland's movefocus spills onto the next display when there is no
+# window that way; aerospace stops at the workspace edge by default, so
+# focus could never leave a monitor. all-monitors-outer-frame restores
+# the omarchy behaviour — only the outer frame of ALL monitors stops it.
+cmd-ctrl-alt-left = 'focus --boundaries all-monitors-outer-frame left'
+cmd-ctrl-alt-down = 'focus --boundaries all-monitors-outer-frame down'
+cmd-ctrl-alt-up = 'focus --boundaries all-monitors-outer-frame up'
+cmd-ctrl-alt-right = 'focus --boundaries all-monitors-outer-frame right'
 
 # Move windows (omarchy: Super+Shift+Arrows)
-cmd-ctrl-alt-shift-left = 'move left'
-cmd-ctrl-alt-shift-down = 'move down'
-cmd-ctrl-alt-shift-up = 'move up'
-cmd-ctrl-alt-shift-right = 'move right'
+# same boundary rule as focus above, so a window can be pushed onto the
+# other display instead of stopping dead at the screen edge
+cmd-ctrl-alt-shift-left = 'move --boundaries all-monitors-outer-frame left'
+cmd-ctrl-alt-shift-down = 'move --boundaries all-monitors-outer-frame down'
+cmd-ctrl-alt-shift-up = 'move --boundaries all-monitors-outer-frame up'
+cmd-ctrl-alt-shift-right = 'move --boundaries all-monitors-outer-frame right'
 
 # Layout (omarchy: Super+T float toggle, Super+J split toggle, Super+F fullscreen)
 cmd-ctrl-alt-t = 'layout floating tiling'
@@ -181,6 +187,10 @@ alt-shift-tab = 'exec-and-forget $HOME/.local/bin/omacosy-cycle prev'
 
 # Cycle focus between monitors (omarchy: Ctrl+Alt+Tab, and free here)
 ctrl-alt-tab = 'focus-monitor next --wrap-around'
+# Super+O ('output', Hyprland's word for a monitor). ctrl-alt-tab above
+# needs three awkward modifiers under the Windows-style Karabiner layout
+# (physical Cmd + Caps Lock + Tab), so this is the one-hand version.
+cmd-ctrl-alt-o = 'focus-monitor next --wrap-around'
 
 # Throw window to the other monitor
 # the same slot, so the twin workspace keeps its meaning
