@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# omacosy-scratchpad toggle|send — omarchy's Super+S / Super+Alt+S.
+#
+# hyprland's scratchpad is a SPECIAL workspace: it drops over whatever
+# you are looking at, like a quake console, and follows you between
+# monitors. aerospace has no special-workspace primitive and cannot
+# overlay anything, so this is the closest honest equivalent: an
+# ordinary workspace named S that gets SUMMONED to the monitor you are
+# on. You switch to it rather than having it drop over — but it does
+# follow you across displays, which is the part that matters.
+#
+# S is deliberately NOT in persistent-workspaces: it should exist only
+# when something is parked in it, so the bar stays clean otherwise.
+set -euo pipefail
+A="$(command -v aerospace || echo /opt/homebrew/bin/aerospace)"
+WS=S
+
+case "${1:-toggle}" in
+  toggle)
+    if [ "$("$A" list-workspaces --focused)" = "$WS" ]; then
+      # leaving: back where you came from, whichever monitor that was
+      "$A" workspace-back-and-forth
+    else
+      # summon-workspace moves S to the FOCUSED monitor and focuses it,
+      # so the scratchpad comes to you instead of yanking you to it.
+      # (S has no workspace-to-monitor-force-assignment, which is what
+      # makes it movable at all — assigned workspaces ignore moves.)
+      "$A" summon-workspace "$WS"
+    fi
+    ;;
+  send)
+    # no --focus-follows-window: stash it and stay put, which is what
+    # omarchy's movetoworkspacesilent does
+    "$A" move-node-to-workspace "$WS"
+    # nothing changed on screen where the window LANDED, so the window
+    # server gives the bar no event — poke it, as omacosy-ws does
+    : > /tmp/omacosy-bar-moved
+    ;;
+  *) exit 2 ;;
+esac
