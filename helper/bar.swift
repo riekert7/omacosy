@@ -2564,8 +2564,11 @@ final class BarView: NSView {
         chipRects.removeAll()
         itemRects.removeAll()
         mediaRects.removeAll()
-        let chipFont = nerdFont("SemiBold", 13)
-        let appFont = nerdFont("Bold", 13)
+        // omarchy's bar text is Style.font.body = 12 (WidgetButton takes
+        // it as its default fontSize); its icons are the separate
+        // bar.icon-font token, which is 13. Hence the split.
+        let chipFont = nerdFont("SemiBold", 12)
+        let appFont = nerdFont("Bold", 12)
         let iconFont = nerdFont("Bold", 13)
         guard let surface else { return }
 
