@@ -6,8 +6,7 @@
 # Docs: https://nikitabobko.github.io/AeroSpace/guide
 
 config-version = 2
-persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9',
-  '11', '12', '13', '14', '15', '16', '17', '18', '19']
+persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 start-at-login = true
 after-login-command = []
@@ -195,14 +194,12 @@ ctrl-alt-tab = 'focus-monitor next --wrap-around'
 # (physical Cmd + Caps Lock + Tab), so this is the one-hand version.
 cmd-ctrl-alt-o = 'focus-monitor next --wrap-around'
 
-# Throw window to the other monitor
-# the same slot, so the twin workspace keeps its meaning
-# (whole-workspace moves conflict with the per-monitor assignment)
-cmd-ctrl-alt-shift-o = 'exec-and-forget $HOME/.local/bin/omacosy-ws 0 throw'
-# Throw the whole workspace
-# every window, to its twin on the other monitor
-cmd-ctrl-alt-shift-space = 'exec-and-forget $HOME/.local/bin/omacosy-ws 0 throw-all'
-
+# Move this WORKSPACE to the other monitor (omarchy:
+# Super+Shift+Alt+Arrow -> movecurrentworkspacetomonitor). That chord
+# cannot exist here: Super IS cmd+ctrl+alt, so Super+Alt+X is byte-
+# identical to Super+X. It lands on Shift+O instead, pairing with
+# Super+O above ('output'). With two displays `next` == directional.
+cmd-ctrl-alt-shift-o = 'move-workspace-to-monitor --wrap-around next'
 # Apps (omarchy: Super+Shift+letter)
 cmd-ctrl-alt-shift-f = 'exec-and-forget open ~'          # files
 cmd-ctrl-alt-shift-m = 'exec-and-forget open -a "@MUSIC@"' # music
@@ -243,27 +240,3 @@ esc = ['reload-config', 'mode main']
 r = ['flatten-workspace-tree', 'mode main']  # reset layout
 backspace = ['close-all-windows-but-current', 'mode main']
 
-# Independent NINE workspaces per display, omarchy-style: the main
-# display owns 1-9, the secondary owns 11-19 (same LAST digit = same
-# slot; the bar and overview render only the slot digit). Super+N is
-# monitor-aware via omacosy-ws. On a single display the secondary set
-# falls back to main and just sits empty.
-[workspace-to-monitor-force-assignment]
-1 = ['main']
-2 = ['main']
-3 = ['main']
-4 = ['main']
-5 = ['main']
-6 = ['main']
-7 = ['main']
-8 = ['main']
-9 = ['main']
-11 = ['secondary', 'main']
-12 = ['secondary', 'main']
-13 = ['secondary', 'main']
-14 = ['secondary', 'main']
-15 = ['secondary', 'main']
-16 = ['secondary', 'main']
-17 = ['secondary', 'main']
-18 = ['secondary', 'main']
-19 = ['secondary', 'main']
