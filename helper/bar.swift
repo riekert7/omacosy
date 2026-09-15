@@ -2636,15 +2636,13 @@ final class BarView: NSView {
             case .some(.image(let icon)):
                 icon.draw(in: NSRect(x: box.midX - 9, y: barHeight / 2 - 9, width: 18, height: 18))
             case .some(.unavailable), .none:
-                // only while it actually holds that app: soleApp survives the
-                // workspace emptying, which left an icon sitting on a slot
-                // that omarchy would draw as a dimmed digit
-                if model.occupied.contains(ws), let app = model.soleApp[ws],
-                   let icon = appIcon(app) {
-                    icon.draw(in: NSRect(x: box.midX - 9, y: barHeight / 2 - 9, width: 18, height: 18))
-                } else {
-                    draw(String(ws.suffix(1)), chipFont, tint, centeredIn: box)
-                }
+                // The digit, always. omarchy's Workspaces.qml draws
+                // String(id) and nothing else; the app icon that used to
+                // land here when a workspace held exactly one app also
+                // fought what the row is FOR — you navigate it by number,
+                // and an icon in slot three means counting positions to
+                // work out that Super+3 is the key.
+                draw(String(ws.suffix(1)), chipFont, tint, centeredIn: box)
             }
             chipRects.append((ws, slot))
             x += chipBox + chipPad * 2
