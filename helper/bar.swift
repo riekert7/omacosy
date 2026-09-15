@@ -2608,19 +2608,31 @@ final class BarView: NSView {
             // globally focused workspace is not a useful answer on the
             // other screen's bar: docked, it never matched there and
             // the laptop had no "you are here" at all.
-            if ws == surface.visible {
+            // Four states where omarchy has two. Its Workspaces.qml knows
+            // only `focused` (drawn as a glyph) and `occupied` (opacity 1
+            // vs 0.5) — and because it reads the GLOBAL focused workspace
+            // with no monitor filter, both displays paint an identical
+            // row and neither says which screen you are actually on.
+            //
+            // Each surface here marks the workspace IT shows, so
+            // "focused" has to outrank "merely visible" or both bars look
+            // equally live. Hence: solid accent where focus really is, a
+            // wash of it where this display is only showing the
+            // workspace, then omarchy's two dim levels underneath.
+            let isFocused = ws == model.focused
+            let isHere = ws == surface.visible
+            let isOccupied = model.occupied.contains(ws)
+            if isFocused || isHere {
                 let pill = NSRect(x: box.minX, y: (barHeight - chipPillHeight) / 2,
                                   width: chipBox, height: chipPillHeight)
-                palette.accent.setFill()
+                (isFocused ? palette.accent
+                           : palette.accent.withAlphaComponent(0.30)).setFill()
                 NSBezierPath(roundedRect: pill, xRadius: radius, yRadius: radius).fill()
             }
-            // omarchy dims a workspace holding nothing (Workspaces.qml:
-            // `occupied || focused ? 1 : 0.5`), so an empty placeholder
-            // reads as available rather than present.
-            let tint: NSColor = ws == surface.visible
-                ? palette.barBG
-                : (model.occupied.contains(ws) ? palette.muted
-                                               : palette.muted.withAlphaComponent(0.5))
+            let tint: NSColor = isFocused ? palette.barBG
+                : isHere ? palette.label
+                : isOccupied ? palette.muted
+                : palette.muted.withAlphaComponent(0.38)
             switch workspaceIconConfig.icon(for: ws) {
             case .some(.glyph(let glyph)):
                 drawIcon(glyph, iconFont, tint, centeredIn: box)
