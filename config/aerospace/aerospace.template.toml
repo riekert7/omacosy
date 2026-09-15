@@ -6,7 +6,14 @@
 # Docs: https://nikitabobko.github.io/AeroSpace/guide
 
 config-version = 2
-persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+# No persistent workspaces, as in omarchy. hyprland destroys a workspace
+# the moment it empties and creates it again on demand, so you have
+# exactly as many as you have populated — never a fixed row of nine.
+# omarchy ships no workspace rules at all to override this: monitors.lua
+# carries only commented examples and `persistent_workspaces` appears
+# nowhere in its repo. aerospace behaves the same way once nothing is
+# declared here: Super+N on a workspace that does not exist creates it
+# on the focused monitor, and it disappears when its last window leaves.
 
 start-at-login = true
 after-login-command = []
