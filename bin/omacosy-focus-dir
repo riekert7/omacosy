@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# omacosy-focus-dir <left|down|up|right> — Super+Arrow.
+#
+# aerospace's `focus` moves between WINDOWS. all-monitors-outer-frame
+# lets it cross the screen edge, but only onto a window: if the other
+# display is showing an empty workspace there is nothing to land on and
+# the key goes dead. Every monitor always shows exactly one workspace,
+# so "empty over there" is a normal state, not an edge case.
+#
+# hyprland's movefocus falls back to the MONITOR in that direction and
+# focuses it empty, which is what makes Super+Arrow feel like it moves
+# between screens rather than between windows. This adds that fallback.
+set -euo pipefail
+dir="${1:-}"
+case "$dir" in left | down | up | right) ;; *) exit 2 ;; esac
+
+A="$(command -v aerospace || echo /opt/homebrew/bin/aerospace)"
+
+# --boundaries-action fail (not the default `stop`) is what turns "no
+# window that way" into a non-zero exit we can branch on.
+if "$A" focus --boundaries all-monitors-outer-frame --boundaries-action fail "$dir" 2>/dev/null; then
+  exit 0
+fi
+
+# No window that way. If there is a MONITOR that way, go to it — even
+# though its workspace is empty. If there is not, the key is a no-op,
+# which is the same as hyprland at the outer edge.
+"$A" focus-monitor "$dir" 2>/dev/null || true

@@ -499,14 +499,20 @@ func omniwmSnapshot() -> Snapshot {
 @discardableResult
 func apply(_ s: Snapshot) -> Bool {
     var changed = false
+    // A wholly empty snapshot means the CLI call failed, not that every
+    // display went blank — keep what we have. Short of that, a monitor's
+    // set is allowed to SHRINK: workspaces move between displays now and
+    // an emptied one stops existing, so the old per-field
+    // "ignore if empty" guards pinned the bar to stale state.
+    if s.perMonitor.values.allSatisfy({ $0.workspaces.isEmpty }) { return false }
     for surface in surfaces {
         guard let part = s.perMonitor[surface.monitorID] else { continue }
-        if !part.workspaces.isEmpty, surface.workspaces != part.workspaces {
+        if surface.workspaces != part.workspaces {
             surface.workspaces = part.workspaces
             surface.mine = Set(part.workspaces)
             changed = true
         }
-        if !part.visible.isEmpty, surface.visible != part.visible {
+        if surface.visible != part.visible {
             surface.visible = part.visible
             changed = true
         }
@@ -523,7 +529,25 @@ func apply(_ s: Snapshot) -> Bool {
 // that owns the workspace also now shows it.
 func setFocused(_ ws: String) {
     model.focused = ws
-    for surface in surfaces where surface.mine.contains(ws) { surface.visible = ws }
+    // `mine` was authoritative while workspace-to-monitor-force-assignment
+    // pinned every workspace to one display. It no longer is: a workspace
+    // follows its windows, Super+Shift+O moves it outright, and an empty
+    // one is summoned to whichever screen you are on. When the focused
+    // workspace is in no surface's set the fast path simply cannot know
+    // which display now shows it — so ask, off the critical path, instead
+    // of leaving every bar marking a workspace that moved.
+    guard surfaces.contains(where: { $0.mine.contains(ws) }) else {
+        kickRebuild()
+        return
+    }
+    for surface in surfaces {
+        if surface.mine.contains(ws) {
+            surface.visible = ws
+        } else if surface.visible == ws {
+            // it used to live here and does not any more
+            surface.visible = ""
+        }
+    }
 }
 
 // --- media (Spotify announces itself; the title needs no subprocess) -------
@@ -2603,7 +2627,11 @@ final class BarView: NSView {
             case .some(.image(let icon)):
                 icon.draw(in: NSRect(x: box.midX - 9, y: barHeight / 2 - 9, width: 18, height: 18))
             case .some(.unavailable), .none:
-                if let app = model.soleApp[ws], let icon = appIcon(app) {
+                // only while it actually holds that app: soleApp survives the
+                // workspace emptying, which left an icon sitting on a slot
+                // that omarchy would draw as a dimmed digit
+                if model.occupied.contains(ws), let app = model.soleApp[ws],
+                   let icon = appIcon(app) {
                     icon.draw(in: NSRect(x: box.midX - 9, y: barHeight / 2 - 9, width: 18, height: 18))
                 } else {
                     draw(String(ws.suffix(1)), chipFont, tint, centeredIn: box)

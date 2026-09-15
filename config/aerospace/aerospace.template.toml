@@ -107,14 +107,16 @@ cmd-ctrl-alt-space = 'exec-and-forget open -a Raycast'
 cmd-ctrl-alt-w = 'close'
 
 # Focus (omarchy: Super+Arrows)
-# Hyprland's movefocus spills onto the next display when there is no
-# window that way; aerospace stops at the workspace edge by default, so
-# focus could never leave a monitor. all-monitors-outer-frame restores
-# the omarchy behaviour — only the outer frame of ALL monitors stops it.
-cmd-ctrl-alt-left = 'focus --boundaries all-monitors-outer-frame left'
-cmd-ctrl-alt-down = 'focus --boundaries all-monitors-outer-frame down'
-cmd-ctrl-alt-up = 'focus --boundaries all-monitors-outer-frame up'
-cmd-ctrl-alt-right = 'focus --boundaries all-monitors-outer-frame right'
+# hyprland's movefocus crosses to the next display, and lands there even
+# when that display is showing an EMPTY workspace. aerospace's `focus`
+# only ever moves between windows, so with nothing to land on the key
+# went dead — and since every monitor always shows exactly one
+# workspace, empty-over-there is a normal state. The wrapper adds
+# hyprland's fallback: no window that way, focus the monitor instead.
+cmd-ctrl-alt-left = 'exec-and-forget $HOME/.local/bin/omacosy-focus-dir left'
+cmd-ctrl-alt-down = 'exec-and-forget $HOME/.local/bin/omacosy-focus-dir down'
+cmd-ctrl-alt-up = 'exec-and-forget $HOME/.local/bin/omacosy-focus-dir up'
+cmd-ctrl-alt-right = 'exec-and-forget $HOME/.local/bin/omacosy-focus-dir right'
 
 # Move windows (omarchy: Super+Shift+Arrows)
 # omarchy's binding is hyprland's `swapwindow`, which EXCHANGES with the
