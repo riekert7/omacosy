@@ -2461,12 +2461,15 @@ func appIcon(_ name: String) -> NSImage? {
     return icon
 }
 
-let barHeight: CGFloat = 34
+// 26 is omarchy's own horizontal bar size (Style.qml:
+// `sizeHorizontal: root.barToken("size-horizontal", 26)`).
+// aerospace.toml's outer.top is barHeight + 8 and must follow it.
+let barHeight: CGFloat = 26
 let padLeft: CGFloat = 10
 let chipBox: CGFloat = 20
 let chipPad: CGFloat = 2
-let pillHeight: CGFloat = 26
-let chipPillHeight: CGFloat = 20
+let pillHeight: CGFloat = 20
+let chipPillHeight: CGFloat = 16
 let radius: CGFloat = 4
 let gap: CGFloat = 14
 
@@ -2563,7 +2566,7 @@ final class BarView: NSView {
         mediaRects.removeAll()
         let chipFont = nerdFont("SemiBold", 13)
         let appFont = nerdFont("Bold", 13)
-        let iconFont = nerdFont("Bold", 14)
+        let iconFont = nerdFont("Bold", 13)
         guard let surface else { return }
 
         // workspace chips, in one bracket. omarchy's bar always paints
@@ -2586,7 +2589,7 @@ final class BarView: NSView {
             .sorted()
         // apple pill: the system menu the hidden native menu bar carried
         let appleGlyph = "\u{f179}"
-        let appleFont = nerdFont("Bold", 15)
+        let appleFont = nerdFont("Bold", 13)
         let appleW = inkBox(appleGlyph, appleFont).width + 20
         let apple = NSRect(x: padLeft, y: (barHeight - pillHeight) / 2, width: appleW, height: pillHeight)
         palette.itemBG.setFill()
