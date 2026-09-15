@@ -2542,17 +2542,24 @@ final class BarView: NSView {
         let iconFont = nerdFont("Bold", 14)
         guard let surface else { return }
 
-        // workspace chips, in one bracket — this display's set only.
-        // Undocked, force-assignment parks the GUEST set (11-19) on the
-        // single display, where its empty slots would render as
-        // duplicate digits — so they are hidden and an empty primary
-        // keeps its slot to hold the row at 1..9. Docked, this
-        // surface's list IS its own set: every slot belongs on the row,
-        // and filtering left the laptop showing two lonely icons.
-        let shown = surfaces.count > 1 ? surface.workspaces
-            : surface.workspaces.filter {
-                $0.count == 1 || model.occupied.contains($0) || $0 == model.focused
-            }
+        // workspace chips, in one bracket. omarchy's bar always paints
+        // 1-5 and adds any other workspace that exists, up to 9
+        // (Workspaces.qml: `var ids = [1,2,3,4,5]`, then every live id
+        // <= 10). hyprland destroys a workspace the moment it empties,
+        // so without that baseline the row shrinks to whatever happens
+        // to hold windows — which is what it did here once
+        // persistent-workspaces went away.
+        //
+        // The row is GLOBAL: the same digits on every display, as in
+        // omarchy. That is what makes Super+1..5 always have somewhere
+        // to land. It is no longer "this display's set" — workspaces
+        // are not pinned to a monitor any more, so a per-display set is
+        // just wherever windows happen to sit.
+        let baseline = ["1", "2", "3", "4", "5"]
+        let live = surfaces.flatMap { $0.workspaces }
+        let shown = Set(baseline).union(live)
+            .filter { $0.count == 1 }
+            .sorted()
         // apple pill: the system menu the hidden native menu bar carried
         let appleGlyph = "\u{f179}"
         let appleFont = nerdFont("Bold", 15)
@@ -2583,7 +2590,13 @@ final class BarView: NSView {
                 palette.accent.setFill()
                 NSBezierPath(roundedRect: pill, xRadius: radius, yRadius: radius).fill()
             }
-            let tint: NSColor = ws == surface.visible ? palette.barBG : palette.muted
+            // omarchy dims a workspace holding nothing (Workspaces.qml:
+            // `occupied || focused ? 1 : 0.5`), so an empty placeholder
+            // reads as available rather than present.
+            let tint: NSColor = ws == surface.visible
+                ? palette.barBG
+                : (model.occupied.contains(ws) ? palette.muted
+                                               : palette.muted.withAlphaComponent(0.5))
             switch workspaceIconConfig.icon(for: ws) {
             case .some(.glyph(let glyph)):
                 drawIcon(glyph, iconFont, tint, centeredIn: box)

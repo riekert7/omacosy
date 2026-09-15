@@ -45,10 +45,22 @@ fi
 
 case "$op" in
   switch)
-    # aerospace makes the workspace visible on ITS monitor and focuses
-    # it, so focus crosses displays when the workspace lives elsewhere.
-    # That is exactly hyprland's `workspace N`.
-    "$A" workspace "$slot"
+    # An OCCUPIED workspace lives on a monitor and you go to it — focus
+    # crosses displays, which is hyprland's `workspace N` and what makes
+    # a workspace feel "stuck" to its screen until thrown.
+    #
+    # An EMPTY one is different. hyprland has no empty workspaces: the
+    # number is conjured on the monitor you are standing on. aerospace
+    # instead parks every unassigned workspace on `main` (its docs:
+    # "by default, all workspaces are assigned to the 'main' monitor"),
+    # so a bare `workspace 6` teleported you to the laptop. summon-
+    # workspace moves it to the FOCUSED monitor and focuses it, which is
+    # the hyprland behaviour.
+    if [ -n "$("$A" list-windows --workspace "$slot" --format '%{window-id}' 2>/dev/null)" ]; then
+      "$A" workspace "$slot"
+    else
+      "$A" summon-workspace "$slot"
+    fi
     ;;
   move)
     "$A" move-node-to-workspace --focus-follows-window "$slot"
