@@ -74,7 +74,7 @@ grant hide themselves rather than half-work.
 | Grant | Who asks | What it does | Without it |
 |---|---|---|---|
 | **Accessibility** | AeroSpace *or* OmniWM, `omacosy-gesture`, `omacosy-bar` (reads the focused app's menus for the app-pill popup), `omacosy-ffm` (AeroSpace mode only) | Move, resize and focus other apps' windows. This is the tiling itself, and it is the broadest permission here. | Nothing tiles. Not optional in practice. |
-| **Input Monitoring** | Karabiner-Elements, `omacosy-gesture` (and OmniWM, under that option) | Karabiner reads keys to remap Caps Lock; `omacosy-gesture` reads raw trackpad contacts, because macOS 26 stopped carrying touch data in normal events. | No Super key, no swipe gestures. |
+| **Input Monitoring** | Karabiner-Elements, `omacosy-gesture` (and OmniWM, under that option) | Karabiner reads keys to remap Command and Caps Lock; `omacosy-gesture` reads raw trackpad contacts, because macOS 26 stopped carrying touch data in normal events. | No Super key, no swipe gestures. |
 | **Screen Recording** | `omacosy-overview` | Captures a thumbnail per window for the overview cards, including windows the window manager has stashed offscreen. A screenshot of the visible screen could not see those. | Cards fall back to app icons and titles. |
 | **Bluetooth** | `omacosy-bar` | Reads adapter power and the paired-device list for the bluetooth pill and its menu. | The pill hides itself. |
 | **Location** | `omacosy-bar` | Reads **only** the wi-fi network's name, which macOS classes as location data. No coordinate is ever requested; the authorisation itself is what unlocks `CWInterface.ssid()`. | The wi-fi popup's title row reads "wi-fi" instead of your network's name. Everything else is unaffected. |
@@ -103,7 +103,7 @@ Refuse the grant and you lose the name, nothing else.
   you, in your login session.
 - **Karabiner-Elements does run as root, and you should know that
   before installing.** It is a Homebrew dependency here, purely to turn
-  Caps Lock into Super. It ships a DriverKit system extension plus
+  Command into Super (and Control into Command). It ships a DriverKit system extension plus
   daemons that run as root (`Karabiner-VirtualHIDDevice-Daemon`,
   `Karabiner-Core-Service`); that is what the driver-extension approval
   during install is. It is the most privileged thing this repo puts on
@@ -143,7 +143,7 @@ Your personal shell config belongs in `~/.zshrc.local`; the repo's
 | Piece | Tool | Config |
 |---|---|---|
 | Tiling WM | [AeroSpace](https://github.com/nikitabobko/AeroSpace) *or* [OmniWM](https://github.com/BarutSRB/OmniWM) via `omacosy-wm-switch` | `config/aerospace/aerospace.template.toml`, `config/omniwm/settings.toml` |
-| Super key | [Karabiner](https://karabiner-elements.pqrs.org) (Caps Lock → cmd+ctrl+alt) | `config/karabiner/` (copied, not symlinked — TCC) |
+| Super key | [Karabiner](https://karabiner-elements.pqrs.org) (Command → cmd+ctrl+alt; Control → Command; Caps Lock → Control) | `config/karabiner/` (copied, not symlinked — TCC) |
 | Status bar, popups, shade | `omacosy-bar` (self-compiled launchd agent, one process draws all of it) | `helper/bar.swift` |
 | Window borders + fullscreen shroud | `omacosy-borders` (self-compiled launchd agent) | `helper/borders.swift`, `config/borders.conf` |
 | Focus follows mouse | `omacosy-ffm` (self-compiled launchd agent; parked under OmniWM, whose native ffm takes over) | `helper/ffm.swift`, `config/ffm-ignore` |
@@ -285,11 +285,21 @@ startup and does no config-file or image-file I/O while it draws.
 - **Floats**: appears only while the workspace holds floating windows;
   click surfaces the next one.
 
-## Keybindings — Super = hold Caps Lock
+## Keybindings — Super = hold Command
 
-Karabiner remaps Caps Lock to `cmd+ctrl+alt` (a combo macOS never
-uses), so omarchy's scheme works letter-for-letter without breaking
-typing or app shortcuts. Caps Lock tapped alone is Escape.
+Karabiner ships three rules here, a Windows-style layout rather than
+upstream's single Caps Lock remap:
+
+1. **Control → Command**, so Ctrl+C / Ctrl+S / Ctrl+W copy, save and
+   close the way they do on Windows.
+2. **Command → Super** (`cmd+ctrl+alt`, a combo macOS never uses), so
+   omarchy's scheme works without breaking typing or app shortcuts.
+3. **Caps Lock → Control** when held, Escape when tapped alone.
+
+Because Super IS `cmd+ctrl+alt`, all three of those modifiers are spent:
+`Super+Alt+X` is byte-identical to `Super+X`, and Shift is the only
+layer left. omarchy's `Super+Ctrl+*` and `Super+Shift+Alt+*` bindings
+cannot be expressed at all and are re-homed — see the table below.
 
 | Chord | Action |
 |---|---|
