@@ -67,6 +67,6 @@ case "$op" in
     moved
     ;;
   next | prev) # omarchy's Super+Tab / Super+Shift+Tab (hyprland e+1/e-1)
-    "$A" workspace --wrap-around "$op"
+    "$A" workspace --no-stdin --wrap-around "$op"
     ;;
 esac
