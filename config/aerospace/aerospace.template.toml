@@ -216,11 +216,11 @@ cmd-ctrl-alt-shift-g = 'exec-and-forget open -a "@MESSENGER@"'   # messenger (om
 
 # AI agents
 # (omarchy: Super+A ChatGPT, Super+Shift+A Grok — here both are Claude:
-# the desktop app, and Claude Code in a terminal. The CLI cannot go
-# through omacosy-spawn, which takes an app name and no command, so it
-# uses Ghostty's -e — exec, not a shell, hence the wrapper script.)
+# the desktop app, and Claude Code in a terminal. omacosy-spawn's second
+# argument is the command for the new Ghostty window; it runs instead of
+# a shell, hence the wrapper script that cds and execs claude.)
 cmd-ctrl-alt-a = 'exec-and-forget $HOME/.local/bin/omacosy-spawn "Claude"'
-cmd-ctrl-alt-shift-a = 'exec-and-forget open -na Ghostty --args -e $HOME/.local/bin/omacosy-agent'
+cmd-ctrl-alt-shift-a = 'exec-and-forget $HOME/.local/bin/omacosy-spawn Ghostty $HOME/.local/bin/omacosy-agent'
 
 # Lock the screen (omarchy: Super+Ctrl+L — ctrl is spent, so Shift+L)
 cmd-ctrl-alt-shift-l = 'exec-and-forget $HOME/.local/bin/omacosy-helper lock'

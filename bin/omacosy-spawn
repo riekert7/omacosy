@@ -13,7 +13,25 @@
 # mess. Worst case the wait gives up after 2s so a broken hint chain
 # can never wedge the terminal key.
 APP="$1"
+CMD="${2:-}"   # optional: run this instead of the shell (Ghostty only)
 [ -n "$APP" ] || exit 1
+
+# A new WINDOW, never a new process. This used `open -na`, and -n starts
+# a second copy of the app every time: four Super+Enters left four
+# Ghostty processes, and Super+A stacked Claude.apps on one profile.
+# Ghostty takes a window over AppleScript (`ghostty +new-window` is
+# Linux-only); anything else is launched, or focused if already running.
+launch() {
+  if [ "$APP" = Ghostty ] && pgrep -q -f "Ghostty.app/Contents/MacOS/ghostty"; then
+    if [ -n "$CMD" ]; then
+      osascript -e "tell application \"Ghostty\" to new window with configuration {command:\"$CMD\"}" >/dev/null
+    else
+      osascript -e 'tell application "Ghostty" to new window' >/dev/null
+    fi
+  else
+    open -a "$APP" ${CMD:+--args -e "$CMD"}
+  fi
+}
 
 # macOS ships no flock; mkdir is the portable atomic lock. Both WM
 # paths need the same serialization, so it is taken ONCE here. A
@@ -50,13 +68,13 @@ if wm_is_omniwm; then
   before="$("$OMNI" window-count 2>/dev/null || echo 0)"
   # the next spawn may go once this window exists: a windows-changed
   # subscription says so the moment it does. Subscribed BEFORE the
-  # open — `open -na` can block until the app is up, and a window that
+  # open — the launch can block until the app is up, and a window that
   # registered before the subscription would never be seen (measured:
   # one spawn in three hit the cap that way). 2 s cap so a launch that
   # never shows a window cannot wedge the terminal key.
   "$OMNI" wait-window "$before" 2000 >/dev/null 2>&1 &
   waiter=$!
-  open -na "$APP"
+  launch
   wait "$waiter" 2>/dev/null || true
   exit 0
 fi
@@ -66,7 +84,7 @@ STATE="/tmp/omacosy-split-state-$(id -u)"
 
 prev=0
 [ -f "$STATE" ] && prev=$(cut -d' ' -f1 "$STATE")
-open -na "$APP"
+launch
 for _ in $(seq 40); do
   cur=0
   [ -f "$STATE" ] && cur=$(cut -d' ' -f1 "$STATE")
