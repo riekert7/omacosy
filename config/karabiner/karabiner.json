@@ -24,6 +24,16 @@
                                     {
                                         "key_code": "left_command"
                                     }
+                                ],
+                                "conditions": [
+                                    {
+                                        "type": "frontmost_application_unless",
+                                        "bundle_identifiers": [
+                                            "^com\\.apple\\.ScreenSharing$",
+                                            "^com\\.tigervnc\\.tigervnc$",
+                                            "^com\\.realvnc\\.rvncconnect$"
+                                        ]
+                                    }
                                 ]
                             },
                             {
@@ -39,6 +49,16 @@
                                 "to": [
                                     {
                                         "key_code": "right_command"
+                                    }
+                                ],
+                                "conditions": [
+                                    {
+                                        "type": "frontmost_application_unless",
+                                        "bundle_identifiers": [
+                                            "^com\\.apple\\.ScreenSharing$",
+                                            "^com\\.tigervnc\\.tigervnc$",
+                                            "^com\\.realvnc\\.rvncconnect$"
+                                        ]
                                     }
                                 ]
                             }
@@ -65,6 +85,16 @@
                                             "left_option"
                                         ]
                                     }
+                                ],
+                                "conditions": [
+                                    {
+                                        "type": "frontmost_application_unless",
+                                        "bundle_identifiers": [
+                                            "^com\\.apple\\.ScreenSharing$",
+                                            "^com\\.tigervnc\\.tigervnc$",
+                                            "^com\\.realvnc\\.rvncconnect$"
+                                        ]
+                                    }
                                 ]
                             },
                             {
@@ -83,6 +113,16 @@
                                         "modifiers": [
                                             "left_control",
                                             "left_option"
+                                        ]
+                                    }
+                                ],
+                                "conditions": [
+                                    {
+                                        "type": "frontmost_application_unless",
+                                        "bundle_identifiers": [
+                                            "^com\\.apple\\.ScreenSharing$",
+                                            "^com\\.tigervnc\\.tigervnc$",
+                                            "^com\\.realvnc\\.rvncconnect$"
                                         ]
                                     }
                                 ]
